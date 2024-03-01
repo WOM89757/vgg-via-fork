@@ -675,6 +675,7 @@ function import_annotations_from_csv(data) {
 
       // check if file is already present in this project
       if ( ! _via_img_metadata.hasOwnProperty(img_id) ) {
+        continue;
         img_id = project_add_new_file(filename, size);
         if ( _via_settings.core.default_filepath === '' ) {
           _via_img_src[img_id] = filename;
@@ -4952,6 +4953,11 @@ function img_fn_list_onpresetfilter_select() {
       switch(filter) {
       case 'files_without_region':
         if ( _via_img_metadata[img_id].regions.length === 0 ) {
+          add_to_list = true;
+        }
+        break;
+      case 'files_have_region_annotations':
+        if ( _via_img_metadata[img_id].regions.length > 0 ) {
           add_to_list = true;
         }
         break;
