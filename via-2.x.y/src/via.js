@@ -65,7 +65,10 @@ var VIA_ATTRIBUTE_TYPE = { TEXT:'text',
                            CHECKBOX:'checkbox',
                            RADIO:'radio',
                            IMAGE:'image',
-                           DROPDOWN:'dropdown'
+                           DROPDOWN:'dropdown',
+                           TEXT_NUMBER: 'text_number_personId',
+                           TEXT_NUMBER_Tracker: 'text_number_trackerId',
+
                          };
 
 var VIA_DISPLAY_AREA_CONTENT_NAME = {IMAGE:'image_panel',
@@ -294,6 +297,9 @@ var img_fn_list_panel     = document.getElementById('img_fn_list_panel');
 var img_fn_list           = document.getElementById('img_fn_list');
 var attributes_panel      = document.getElementById('attributes_panel');
 var leftsidebar           = document.getElementById('leftsidebar');
+
+var _via_person_id = 0;
+var _via_tracker_id = 0;
 
 var BBOX_LINE_WIDTH       = 4;
 var BBOX_SELECTED_OPACITY = 0.3;
@@ -5291,6 +5297,12 @@ function show_attribute_properties() {
                                           'Def.',
                                           attr_default_value,
                                           'attribute_default_value');
+  } else if (attr_input_type === 'text_number') {
+    var attr_default_value = _via_attributes[attr_type][attr_id].default_value;
+    attribute_property_add_input_property('Default value of this attribute',
+                                          'Def.',
+                                          attr_default_value,
+                                          'attribute_default_value');
   }
 
   // add dropdown for type of attribute
@@ -5332,6 +5344,42 @@ function show_attribute_options() {
 
   // populate additional options based on attribute type
   switch( attr_type ) {
+  
+  case VIA_ATTRIBUTE_TYPE.TEXT_NUMBER:
+  case VIA_ATTRIBUTE_TYPE.TEXT_NUMBER_Tracker:
+    // var counterContainer = document.createElement('div');
+    // counterContainer.setAttribute('class', 'counter-container');
+
+    // var decreaseBtn = document.createElement('button');
+    // decreaseBtn.innerHTML = '-';
+    // decreaseBtn.onclick = function () {
+    //     var counterInput = document.getElementById('counter-input');
+    //     counterInput.value = parseInt(counterInput.value) - 1;
+    // };
+
+    // var counterInput = document.createElement('input');
+    // counterInput.setAttribute('type', 'text');
+    // counterInput.setAttribute('id', 'counter-input');
+    // counterInput.setAttribute('value', '0');
+    // counterInput.setAttribute('readonly', true);
+
+    // var increaseBtn = document.createElement('button');
+    // increaseBtn.innerHTML = '+';
+    // increaseBtn.onclick = function () {
+    //     var counterInput = document.getElementById('counter-input');
+    //     counterInput.value = parseInt(counterInput.value) + 1;
+    // };
+
+    // counterContainer.appendChild(decreaseBtn);
+    // counterContainer.appendChild(counterInput);
+    // counterContainer.appendChild(increaseBtn);
+
+    // document.getElementById('attribute_options').appendChild(counterContainer);
+
+
+    console.log('Attribute type ' + attr_type + ' is test number');
+    break;
+  
   case VIA_ATTRIBUTE_TYPE.TEXT:
     // text does not have any additional properties
     break;
@@ -5517,6 +5565,10 @@ function attribute_property_on_update(p) {
     _via_attributes[attr_type][attr_id].type = new_attr_type;
     if( new_attr_type === VIA_ATTRIBUTE_TYPE.TEXT ) {
       _via_attributes[attr_type][attr_id].default_value = '';
+      delete _via_attributes[attr_type][attr_id].options;
+      delete _via_attributes[attr_type][attr_id].default_options;
+    } else if( new_attr_type === VIA_ATTRIBUTE_TYPE.TEXT_NUMBER || new_attr_type === VIA_ATTRIBUTE_TYPE.TEXT_NUMBER_Tracker ) {
+      _via_attributes[attr_type][attr_id].default_value = '0';
       delete _via_attributes[attr_type][attr_id].options;
       delete _via_attributes[attr_type][attr_id].default_options;
     } else {
@@ -6622,6 +6674,75 @@ function annotation_editor_get_metadata_row_html(row_id) {
         'title="' + attr_desc + '" ' +
         'placeholder="' + attr_placeholder + '" ' +
         'id="' + attr_html_id + '">' + attr_value + '</textarea>';
+      break;
+    case 'text_number_personId':
+      var counterContainer = document.createElement('div');
+      counterContainer.setAttribute('class', 'person-counter-container');
+
+      var decreaseBtn = document.createElement('button');
+      decreaseBtn.innerHTML = '-';
+      decreaseBtn.onclick = function () {
+          var counterInput = document.getElementById('person-counter-input');
+          counterInput.value = parseInt(counterInput.value) - 1;
+          _via_person_id = counterInput.value;
+      };
+
+      var counterInput = document.createElement('input');
+      counterInput.setAttribute('type', 'text');
+      counterInput.setAttribute('id', 'person-counter-input');
+      counterInput.setAttribute('value', _via_person_id);
+      // console.log("person id " + _via_person_id);
+      // counterInput.setAttribute('readonly', false);
+
+      var increaseBtn = document.createElement('button');
+      increaseBtn.innerHTML = '+';
+      increaseBtn.onclick = function () {
+          var counterInput = document.getElementById('person-counter-input');
+          counterInput.value = parseInt(counterInput.value) + 1;
+          _via_person_id = counterInput.value;
+          
+      };
+      counterInput.setAttribute('onfocus', 'annotation_editor_on_metadata_focus(this)');
+      counterInput.setAttribute('onchange', 'annotation_editor_on_metadata_update(this)');
+
+      counterContainer.appendChild(decreaseBtn);
+      counterContainer.appendChild(counterInput);
+      counterContainer.appendChild(increaseBtn);
+      col.appendChild(counterContainer);
+      break;
+    case 'text_number_trackerId':
+      var counterContainer = document.createElement('div');
+      counterContainer.setAttribute('class', 'track-counter-container');
+
+      var decreaseBtn = document.createElement('button');
+      decreaseBtn.innerHTML = '-';
+      decreaseBtn.onclick = function () {
+          var counterInput = document.getElementById('track-counter-input');
+          counterInput.value = parseInt(counterInput.value) - 1;
+          _via_tracker_id = counterInput.value;
+      };
+
+      var counterInput = document.createElement('input');
+      counterInput.setAttribute('type', 'text');
+      counterInput.setAttribute('id', 'track-counter-input');
+      counterInput.setAttribute('value', _via_tracker_id);
+
+      var increaseBtn = document.createElement('button');
+      increaseBtn.innerHTML = '+';
+      increaseBtn.onclick = function () {
+          var counterInput = document.getElementById('track-counter-input');
+          counterInput.value = parseInt(counterInput.value) + 1;
+          _via_tracker_id = counterInput.value;
+          
+      };
+      counterInput.setAttribute('onfocus', 'annotation_editor_on_metadata_focus(this)');
+      counterInput.setAttribute('onchange', 'annotation_editor_on_metadata_update(this)');
+
+      counterContainer.appendChild(decreaseBtn);
+      counterContainer.appendChild(counterInput);
+      counterContainer.appendChild(increaseBtn);
+      col.appendChild(counterContainer);
+
       break;
     case 'checkbox':
       var options = _via_attributes[_via_metadata_being_updated][attr_id].options;
